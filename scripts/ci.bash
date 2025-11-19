@@ -72,14 +72,14 @@ else
 fi
 
 # Step 1: Create the workspace
-echo "Step 1: Creating workspace..."
+echo "Step 1: Creating workspace with name ${WORKSPACE_NAME}..."
 fab mkdir ${WORKSPACE_NAME} -P capacityName=${CAPACITY_NAME}
 WORKSPACE_ID=$(fab get ${WORKSPACE_NAME} -q id)
 echo "✓ Workspace created with ID: ${WORKSPACE_ID}"
 
 # Step 2: Grant admin security group access to the workspace
 echo "Step 2: Granting admin access..."
-fab api -X post workspaces/${WORKSPACE_ID}/roleAssignments -i '{
+PAYLOAD='{
   "principal": {
     "displayName": "'${SECGROUP_ADMINS_NAME}'",
     "id": "'${SECGROUP_ADMINS_ID}'",
@@ -90,12 +90,15 @@ fab api -X post workspaces/${WORKSPACE_ID}/roleAssignments -i '{
   },
   "role": "Admin"
 }'
+echo "  Command: fab api -X post workspaces/${WORKSPACE_ID}/roleAssignments"
+echo "  Payload: ${PAYLOAD}"
+fab api -X post workspaces/${WORKSPACE_ID}/roleAssignments -i "${PAYLOAD}"
 echo "✓ Admin access granted"
 
 # Step 3: Grant developer security group access to the workspace
 if [ -n "${SECGROUP_DEVS_ID}" ] && [ -n "${SECGROUP_DEVS_NAME}" ]; then
   echo "Step 3: Granting developer access..."
-  fab api -X post workspaces/${WORKSPACE_ID}/roleAssignments -i '{
+  PAYLOAD='{
     "principal": {
       "displayName": "'${SECGROUP_DEVS_NAME}'",
       "id": "'${SECGROUP_DEVS_ID}'",
@@ -106,6 +109,9 @@ if [ -n "${SECGROUP_DEVS_ID}" ] && [ -n "${SECGROUP_DEVS_NAME}" ]; then
     },
     "role": "Contributor"
   }'
+  echo "  Command: fab api -X post workspaces/${WORKSPACE_ID}/roleAssignments"
+  echo "  Payload: ${PAYLOAD}"
+  fab api -X post workspaces/${WORKSPACE_ID}/roleAssignments -i "${PAYLOAD}"
   echo "✓ Developer access granted"
 else
   echo "⊘ Skipping developer access (no dev security group configured)"
