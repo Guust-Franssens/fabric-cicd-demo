@@ -1,0 +1,53 @@
+name: Fabric CD - Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy-production:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Fabric CLI
+        run: |
+          pip install fabric-cli
+          fab --version
+
+      - name: Authenticate to Fabric
+        env:
+          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
+          FABRIC_CLIENT_SECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
+          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
+        run: |
+          fab auth login --service-principal \
+            --client-id $FABRIC_CLIENT_ID \
+            --client-secret $FABRIC_CLIENT_SECRET \
+            --tenant-id $FABRIC_TENANT_ID
+
+      - name: Set environment variables
+        run: |
+          echo "BRANCH_NAME=main" >> $GITHUB_ENV
+          echo "PROJECT_NAME=${{ secrets.PROJECT_NAME }}" >> $GITHUB_ENV
+
+      - name: Run CD script
+        env:
+          CAPACITY_NAME: ${{ secrets.CAPACITY_NAME }}
+          PRODUCTION_WORKSPACE_ID: ${{ secrets.PRODUCTION_WORKSPACE_ID }}
+        run: |
+          chmod +x ./scripts/cd.bash
+          ./scripts/cd.bash
+
+      - name: Summary
+        run: |
+          echo "## Production Deployment Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: main" >> $GITHUB_STEP_SUMMARY
+          echo "- **Workspace**: Production" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: Successfully deployed" >> $GITHUB_STEP_SUMMARY
