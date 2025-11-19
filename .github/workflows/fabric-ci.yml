@@ -49,9 +49,9 @@ jobs:
 
       - name: Run CI script
         env:
-          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
-          FABRIC_CLIENT_SECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
-          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          TENANT_ID: ${{ secrets.TENANT_ID }}
           CAPACITY_NAME: ${{ secrets.CAPACITY_NAME }}
           PE_RESOURCE_ID: ${{ secrets.PE_RESOURCE_ID }}
           GIT_CONNECTION_NAME: ${{ secrets.GIT_CONNECTION_NAME }}
