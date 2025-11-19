@@ -30,10 +30,15 @@ jobs:
       - name: Setup Fabric CLI
         run: |
           # Install Fabric CLI
-          pip install git+https://github.com/microsoft/fabric-cli.git
+          pip install git+https://github.com/microsoft/fabric-cli.git jq
           
           # Verify installation
           fab --version
+
+          # Set config and login
+          fab config set encryption_fallback_enabled true
+          fab auth login -u "${{ secrets.CLIENT_ID }}" -p "${{ secrets.CLIENT_SECRET }}" --tenant "${{ secrets.TENANT_ID }}"
+          fab auth status
 
       - name: Set environment variables
         run: |
