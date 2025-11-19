@@ -18,8 +18,8 @@ on:
 jobs:
   create-workspace:
     runs-on: ubuntu-latest
-    # Only run for branch creation or pushes to feature branches
-    if: github.event_name == 'create' || startsWith(github.ref, 'refs/heads/feature/') || startsWith(github.ref, 'refs/heads/fix/')
+    # Only run for branch creation or manual trigger (not on subsequent pushes)
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'create'
     
     steps:
       - name: Checkout code
