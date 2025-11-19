@@ -8,6 +8,12 @@ on:
     branches:
       - 'feature/**'
       - 'dev/**'
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: 'Branch name to deploy (leave empty to use current branch)'
+        required: false
+        type: string
 
 jobs:
   create-workspace:
@@ -29,27 +35,23 @@ jobs:
           # Verify installation
           fab --version
 
-      - name: Authenticate to Fabric
-        env:
-          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
-          FABRIC_CLIENT_SECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
-          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
-        run: |
-          # Authenticate using service principal
-          fab auth login --service-principal \
-            --client-id $FABRIC_CLIENT_ID \
-            --client-secret $FABRIC_CLIENT_SECRET \
-            --tenant-id $FABRIC_TENANT_ID
-
       - name: Set environment variables
         run: |
-          echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+          # Use manual input if provided, otherwise use current branch
+          if [ -n "${{ inputs.branch_name }}" ]; then
+            echo "BRANCH_NAME=${{ inputs.branch_name }}" >> $GITHUB_ENV
+          else
+            echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+          fi
           echo "PROJECT_NAME=${{ secrets.PROJECT_NAME }}" >> $GITHUB_ENV
           echo "GIT_REPO_OWNER=${{ github.repository_owner }}" >> $GITHUB_ENV
           echo "GIT_REPO_NAME=${{ github.event.repository.name }}" >> $GITHUB_ENV
 
       - name: Run CI script
         env:
+          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
+          FABRIC_CLIENT_SECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
+          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
           CAPACITY_NAME: ${{ secrets.CAPACITY_NAME }}
           PE_RESOURCE_ID: ${{ secrets.PE_RESOURCE_ID }}
           GIT_CONNECTION_NAME: ${{ secrets.GIT_CONNECTION_NAME }}
