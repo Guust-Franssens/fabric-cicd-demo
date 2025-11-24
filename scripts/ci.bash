@@ -169,3 +169,4 @@ echo "Branch (safe): ${BRANCH_NAME_SAFE}"
 echo "Commit: ${REMOTE_COMMIT_HASH}"
 echo "========================================="
 
+set +euo
