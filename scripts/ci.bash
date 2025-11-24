@@ -90,8 +90,6 @@ PAYLOAD='{
   },
   "role": "Admin"
 }'
-echo "  Command: fab api -X post workspaces/${WORKSPACE_ID}/roleAssignments"
-echo "  Payload: ${PAYLOAD}"
 fab api -X post workspaces/${WORKSPACE_ID}/roleAssignments -i "${PAYLOAD}"
 echo "✓ Admin access granted"
 
@@ -109,8 +107,6 @@ if [ -n "${SECGROUP_DEVS_ID}" ] && [ -n "${SECGROUP_DEVS_NAME}" ]; then
     },
     "role": "Contributor"
   }'
-  echo "  Command: fab api -X post workspaces/${WORKSPACE_ID}/roleAssignments"
-  echo "  Payload: ${PAYLOAD}"
   fab api -X post workspaces/${WORKSPACE_ID}/roleAssignments -i "${PAYLOAD}"
   echo "✓ Developer access granted"
 else
