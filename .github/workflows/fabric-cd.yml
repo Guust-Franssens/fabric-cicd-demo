@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+      - dev
+      - test
   workflow_dispatch:
 
 jobs:
@@ -18,36 +20,55 @@ jobs:
 
       - name: Setup Fabric CLI
         run: |
-          pip install fabric-cli
+          pip install fabric-cli jq
+
+          # Verify installation
           fab --version
 
-      - name: Authenticate to Fabric
-        env:
-          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
-          FABRIC_CLIENT_SECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
-          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
-        run: |
-          fab auth login --service-principal \
-            --client-id $FABRIC_CLIENT_ID \
-            --client-secret $FABRIC_CLIENT_SECRET \
-            --tenant-id $FABRIC_TENANT_ID
+          # Set config and login
+          fab config set encryption_fallback_enabled true
+          fab auth login -u "${{ secrets.CLIENT_ID }}" -p "${{ secrets.CLIENT_SECRET }}" --tenant "${{ secrets.TENANT_ID }}"
+          fab auth status
 
       - name: Set environment variables
         run: |
-          echo "BRANCH_NAME=main" >> $GITHUB_ENV
-          echo "PROJECT_NAME=${{ secrets.PROJECT_NAME }}" >> $GITHUB_ENV
+          BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+          echo "PROJECT_NAME=${{ vars.PROJECT_NAME }}" >> $GITHUB_ENV
+          echo "DEV_WORKSPACE_ID=${{ vars.DEV_WORKSPACE_ID }}" >> $GITHUB_ENV
+          echo "TEST_WORKSPACE_ID=${{ vars.TEST_WORKSPACE_ID }}" >> $GITHUB_ENV
+          echo "PROD_WORKSPACE_ID=${{ vars.PROD_WORKSPACE_ID }}" >> $GITHUB_ENV
+          
+          # Set workspace ID based on branch
+          case "$BRANCH_NAME" in
+            main)
+              echo "ENVIRONMENT=prod" >> $GITHUB_ENV
+              ;;
+            dev)
+              echo "ENVIRONMENT=dev" >> $GITHUB_ENV
+              ;;
+            test)
+              echo "ENVIRONMENT=test" >> $GITHUB_ENV
+              ;;
+            *)
+              echo "Unknown branch: $BRANCH_NAME"
+              exit 1
+              ;;
+          esac
 
       - name: Run CD script
         env:
-          CAPACITY_NAME: ${{ secrets.CAPACITY_NAME }}
-          PRODUCTION_WORKSPACE_ID: ${{ secrets.PRODUCTION_WORKSPACE_ID }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          TENANT_ID: ${{ secrets.TENANT_ID }}
+          CAPACITY_NAME: ${{ vars.CAPACITY_NAME }}
         run: |
           chmod +x ./scripts/cd.bash
           ./scripts/cd.bash
 
       - name: Summary
         run: |
-          echo "## Production Deployment Complete ✅" >> $GITHUB_STEP_SUMMARY
-          echo "- **Branch**: main" >> $GITHUB_STEP_SUMMARY
-          echo "- **Workspace**: Production" >> $GITHUB_STEP_SUMMARY
+          echo "## Deployment Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: ${BRANCH_NAME}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: ${ENVIRONMENT}" >> $GITHUB_STEP_SUMMARY
           echo "- **Status**: Successfully deployed" >> $GITHUB_STEP_SUMMARY
