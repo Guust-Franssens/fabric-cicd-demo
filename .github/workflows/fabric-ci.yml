@@ -2,18 +2,24 @@ name: Fabric CI - Create Feature Workspace
 
 on:
   create:
-    branches:
-      - '**'
-  push:
-    branches:
-      - 'feature/**'
-      - 'dev/**'
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: 'Branch name to deploy (leave empty to use current branch)'
+        required: false
+        type: string
 
 jobs:
   create-workspace:
     runs-on: ubuntu-latest
-    # Only run for branch creation or pushes to feature branches
-    if: github.event_name == 'create' || startsWith(github.ref, 'refs/heads/feature/') || startsWith(github.ref, 'refs/heads/fix/')
+    # Only run for branch creation or manual trigger (not on subsequent pushes)
+    if: |
+      github.event_name == 'workflow_dispatch' || 
+      (github.event_name == 'create' && 
+       (startsWith(github.ref, 'refs/heads/feature/') || 
+        startsWith(github.ref, 'refs/heads/feat/') ||
+        startsWith(github.ref, 'refs/heads/fix/') ||
+        startsWith(github.ref, 'refs/heads/patch/')))
     
     steps:
       - name: Checkout code
@@ -24,39 +30,40 @@ jobs:
       - name: Setup Fabric CLI
         run: |
           # Install Fabric CLI
-          pip install git+https://github.com/microsoft/fabric-cli.git
+          pip install git+https://github.com/microsoft/fabric-cli.git jq
           
           # Verify installation
           fab --version
 
-      - name: Authenticate to Fabric
-        env:
-          FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
-          FABRIC_CLIENT_SECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
-          FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
-        run: |
-          # Authenticate using service principal
-          fab auth login --service-principal \
-            --client-id $FABRIC_CLIENT_ID \
-            --client-secret $FABRIC_CLIENT_SECRET \
-            --tenant-id $FABRIC_TENANT_ID
+          # Set config and login
+          fab config set encryption_fallback_enabled true
+          fab auth login -u "${{ secrets.CLIENT_ID }}" -p "${{ secrets.CLIENT_SECRET }}" --tenant "${{ secrets.TENANT_ID }}"
+          fab auth status
 
       - name: Set environment variables
         run: |
-          echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
-          echo "PROJECT_NAME=${{ secrets.PROJECT_NAME }}" >> $GITHUB_ENV
+          # Use manual input if provided, otherwise use current branch
+          if [ -n "${{ inputs.branch_name }}" ]; then
+            echo "BRANCH_NAME=${{ inputs.branch_name }}" >> $GITHUB_ENV
+          else
+            echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+          fi
+          echo "PROJECT_NAME=${{ vars.PROJECT_NAME }}" >> $GITHUB_ENV
           echo "GIT_REPO_OWNER=${{ github.repository_owner }}" >> $GITHUB_ENV
           echo "GIT_REPO_NAME=${{ github.event.repository.name }}" >> $GITHUB_ENV
 
       - name: Run CI script
         env:
-          CAPACITY_NAME: ${{ secrets.CAPACITY_NAME }}
-          PE_RESOURCE_ID: ${{ secrets.PE_RESOURCE_ID }}
-          GIT_CONNECTION_NAME: ${{ secrets.GIT_CONNECTION_NAME }}
-          SECGROUP_ADMINS_ID: ${{ secrets.SECGROUP_ADMINS_ID }}
-          SECGROUP_ADMINS_NAME: ${{ secrets.SECGROUP_ADMINS_NAME }}
-          SECGROUP_DEVS_ID: ${{ secrets.SECGROUP_DEVS_ID }}
-          SECGROUP_DEVS_NAME: ${{ secrets.SECGROUP_DEVS_NAME }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          TENANT_ID: ${{ secrets.TENANT_ID }}
+          CAPACITY_NAME: ${{ vars.CAPACITY_NAME }}
+          PE_RESOURCE_ID: ${{ vars.PE_RESOURCE_ID }}
+          GIT_CONNECTION_NAME: ${{ vars.GIT_CONNECTION_NAME }}
+          SECGROUP_ADMINS_ID: ${{ vars.SECGROUP_ADMINS_ID }}
+          SECGROUP_ADMINS_NAME: ${{ vars.SECGROUP_ADMINS_NAME }}
+          SECGROUP_DEVS_ID: ${{ vars.SECGROUP_DEVS_ID }}
+          SECGROUP_DEVS_NAME: ${{ vars.SECGROUP_DEVS_NAME }}
         run: |
           chmod +x ./scripts/ci.bash
           ./scripts/ci.bash
