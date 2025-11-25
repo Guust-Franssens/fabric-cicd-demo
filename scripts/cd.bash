@@ -62,6 +62,7 @@ BODY='{
   }
 }'
 RESPONSE=$(fab api -X post workspaces/${TARGET_WORKSPACE_ID}/git/updateFromGit -i "${BODY}")
+STATUS_CODE=$(echo "$RESPONSE" | jq -r '.status_code' | tr -d '\r\n')
 if [ "$STATUS_CODE" -ge 200 ] && [ "$STATUS_CODE" -lt 300 ]; then
   echo "✓ Successfully updated '${TARGET_WORKSPACE_NAME}'"
 else
