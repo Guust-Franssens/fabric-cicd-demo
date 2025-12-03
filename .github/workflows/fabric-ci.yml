@@ -57,8 +57,8 @@ jobs:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
           TENANT_ID: ${{ secrets.TENANT_ID }}
+          PE_KEYVAULT_RESOURCE_ID: ${{ secrets.PE_KEYVAULT_RESOURCE_ID }}
           CAPACITY_NAME: ${{ vars.CAPACITY_NAME }}
-          PE_RESOURCE_ID: ${{ vars.PE_RESOURCE_ID }}
           GIT_CONNECTION_NAME: ${{ vars.GIT_CONNECTION_NAME }}
           SECGROUP_ADMINS_ID: ${{ vars.SECGROUP_ADMINS_ID }}
           SECGROUP_ADMINS_NAME: ${{ vars.SECGROUP_ADMINS_NAME }}
