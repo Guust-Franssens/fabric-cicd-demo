@@ -113,12 +113,11 @@ else
   echo "⊘ Skipping developer access (no dev security group configured)"
 fi
 
-# Step 4: Create managed private endpoint
-if [ -n "${PE_RESOURCE_ID}" ]; then
+# Step 4: Create keyvault managed private endpoint
+if [ -n "${PE_KEYVAULT_RESOURCE_ID}" ]; then
   echo "Step 4: Creating managed private endpoint..."
-  fab -c "cd ${WORKSPACE_NAME}" \
-      -c "create .managedprivateendpoints/pe-belgian-journal-blob.ManagedPrivateEndpoint -P targetprivatelinkresourceid=${PE_RESOURCE_ID},targetsubresourcetype=blob"
-  echo "✓ Managed private endpoint created"
+  fab create ${WORKSPACE_NAME}/.managedprivateendpoints/mpe-keyvault.ManagedPrivateEndpoint \
+    -P targetprivatelinkresourceid=${PE_KEYVAULT_RESOURCE_ID},targetsubresourcetype=vault,autoApproveEnabled=true
 else
   echo "⊘ Skipping managed private endpoint (no resource ID configured)"
 fi
