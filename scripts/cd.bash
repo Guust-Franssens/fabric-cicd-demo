@@ -1,12 +1,9 @@
-# Load .env file if it exists (for local development)
+# Load common utility functions
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_FILE="${SCRIPT_DIR}/../.env"
-if [ -f "${ENV_FILE}" ]; then
-  echo "Loading configuration from .env file..."
-  set -a  # automatically export all variables
-  source "${ENV_FILE}"
-  set +a
-fi
+source "${SCRIPT_DIR}/common.bash"
+
+# Load environment variables
+load_env
 
 # Set workspace ID based on environment
 case "${ENVIRONMENT}" in
@@ -32,21 +29,8 @@ echo "Deploying to environment: ${ENVIRONMENT}"
 echo "Target workspace ID: ${TARGET_WORKSPACE_ID}"
 echo "Workspace name: ${TARGET_WORKSPACE_NAME}"
 
-# Check if logged in to Fabric CLI
-LOGGED_IN=$(fab auth status --output_format json 2>/dev/null | jq -r '.result.data[0].logged_in // false' || echo "false")
-if [ "$LOGGED_IN" != "true" ]; then
-  echo "Not logged in to Fabric CLI. Attempting login..."
-  if [ -n "${TENANT_ID}" ] && [ -n "${CLIENT_ID}" ] && [ -n "${CLIENT_SECRET}" ]; then
-    echo "Using service principal authentication..."
-    fab auth login -u "$CLIENT_ID" -p "$CLIENT_SECRET" --tenant "$TENANT_ID"
-  else
-    echo "Using interactive authentication..."
-    fab auth login
-  fi
-  echo "✓ Successfully logged in to Fabric CLI"
-else
-  echo "✓ Already logged in to Fabric CLI"
-fi
+# Ensure logged in to Fabric CLI
+ensure_fabric_login
 
 RESPONSE=$(fab api workspaces/${TARGET_WORKSPACE_ID}/git/status)
 REMOTE_COMMIT_HASH=$(echo "${RESPONSE}" | jq -r '.text.remoteCommitHash' | tr -d '\r\n')
@@ -62,7 +46,6 @@ BODY='{
   }
 }'
 RESPONSE=$(fab api -X post workspaces/${TARGET_WORKSPACE_ID}/git/updateFromGit -i "${BODY}")
-STATUS_CODE=$(echo "$RESPONSE" | jq -r '.status_code' | tr -d '\r\n')
 if [ "$STATUS_CODE" -ge 200 ] && [ "$STATUS_CODE" -lt 300 ]; then
   echo "✓ Successfully updated '${TARGET_WORKSPACE_NAME}'"
 else

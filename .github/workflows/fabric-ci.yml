@@ -30,7 +30,7 @@ jobs:
       - name: Setup Fabric CLI
         run: |
           # Install Fabric CLI
-          pip install git+https://github.com/microsoft/fabric-cli.git jq
+          pip install ms-fabric-cli jq
           
           # Verify installation
           fab --version
@@ -61,9 +61,7 @@ jobs:
           CAPACITY_NAME: ${{ vars.CAPACITY_NAME }}
           GIT_CONNECTION_NAME: ${{ vars.GIT_CONNECTION_NAME }}
           SECGROUP_ADMINS_ID: ${{ vars.SECGROUP_ADMINS_ID }}
-          SECGROUP_ADMINS_NAME: ${{ vars.SECGROUP_ADMINS_NAME }}
           SECGROUP_DEVS_ID: ${{ vars.SECGROUP_DEVS_ID }}
-          SECGROUP_DEVS_NAME: ${{ vars.SECGROUP_DEVS_NAME }}
         run: |
           chmod +x ./scripts/ci.bash
           ./scripts/ci.bash

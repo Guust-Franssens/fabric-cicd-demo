@@ -1,0 +1,68 @@
+name: Fabric Cleanup - Delete Feature Workspace
+
+on:
+  delete:
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: 'Branch name to cleanup (required for manual trigger)'
+        required: true
+        type: string
+
+jobs:
+  cleanup-workspace:
+    runs-on: ubuntu-latest
+    # Only run for feature branch deletion or manual trigger
+    if: |
+      github.event_name == 'workflow_dispatch' || 
+      (github.event_name == 'delete' && 
+       github.event.ref_type == 'branch' &&
+       (startsWith(github.event.ref, 'feature/') || 
+        startsWith(github.event.ref, 'feat/') ||
+        startsWith(github.event.ref, 'fix/') ||
+        startsWith(github.event.ref, 'patch/')))
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: main  # Checkout main branch since the deleted branch is gone
+          fetch-depth: 0
+
+      - name: Setup Fabric CLI
+        run: |
+          # Install Fabric CLI
+          pip install ms-fabric-cli jq
+          
+          # Verify installation
+          fab --version
+
+          # Set config and login
+          fab config set encryption_fallback_enabled true
+          fab auth login -u "${{ secrets.CLIENT_ID }}" -p "${{ secrets.CLIENT_SECRET }}" --tenant "${{ secrets.TENANT_ID }}"
+          fab auth status
+
+      - name: Set environment variables
+        run: |
+          # Use manual input if provided, otherwise use the deleted branch name
+          if [ -n "${{ inputs.branch_name }}" ]; then
+            echo "BRANCH_NAME=${{ inputs.branch_name }}" >> $GITHUB_ENV
+          else
+            echo "BRANCH_NAME=${{ github.event.ref }}" >> $GITHUB_ENV
+          fi
+          echo "PROJECT_NAME=${{ vars.PROJECT_NAME }}" >> $GITHUB_ENV
+
+      - name: Run cleanup script
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          TENANT_ID: ${{ secrets.TENANT_ID }}
+        run: |
+          chmod +x ./scripts/cleanup.bash
+          ./scripts/cleanup.bash
+
+      - name: Summary
+        run: |
+          echo "## Fabric Workspace Cleanup ✅" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: ${BRANCH_NAME}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: Successfully cleaned up" >> $GITHUB_STEP_SUMMARY
