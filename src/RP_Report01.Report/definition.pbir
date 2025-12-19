@@ -1,8 +1,9 @@
 {
-  "version": "4.0",
-  "datasetReference": {
-    "byPath": {
-      "path": "../SM_SalesSense.SemanticModel"
+    "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definitionProperties/2.0.0/schema.json",
+    "version": "4.0",
+    "datasetReference": {
+        "byConnection": {
+            "connectionString": "Data Source=powerbi://api.powerbi.com/v1.0/myorg/SalesSense;initial catalog=SM_SalesSense;integrated security=ClaimsToken;semanticmodelid=b2575a0c-bcd0-40e2-9079-190525419e8b"
+        }
     }
-  }
 }

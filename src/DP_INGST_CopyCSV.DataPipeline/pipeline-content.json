@@ -32,7 +32,7 @@
                                 }
                             },
                             "externalReferences": {
-                                "connection": "e18da205-1457-4fb5-904e-7b853a0fc0c6"
+                                "connection": "d8919848-6583-403d-9cab-ba993504532f"
                             }
                         }
                     },
@@ -49,8 +49,8 @@
                                     "annotations": [],
                                     "type": "Lakehouse",
                                     "typeProperties": {
-                                        "workspaceId": "84912f9a-8d9a-43d0-a945-99e74142a0f2",
-                                        "artifactId": "3d020a17-ccd9-402e-9f1a-01c458a797b2",
+                                        "workspaceId": "80b178c4-ac51-40c7-b808-a5385f9e0ed3",
+                                        "artifactId": "7a3fab9c-8535-4d8a-a8f4-dafad988a13e",
                                         "rootFolder": "Files"
                                     }
                                 }
@@ -100,7 +100,7 @@
                                 }
                             },
                             "externalReferences": {
-                                "connection": "e18da205-1457-4fb5-904e-7b853a0fc0c6"
+                                "connection": "d8919848-6583-403d-9cab-ba993504532f"
                             }
                         }
                     },
@@ -117,8 +117,8 @@
                                     "annotations": [],
                                     "type": "Lakehouse",
                                     "typeProperties": {
-                                        "workspaceId": "84912f9a-8d9a-43d0-a945-99e74142a0f2",
-                                        "artifactId": "3d020a17-ccd9-402e-9f1a-01c458a797b2",
+                                        "workspaceId": "80b178c4-ac51-40c7-b808-a5385f9e0ed3",
+                                        "artifactId": "7a3fab9c-8535-4d8a-a8f4-dafad988a13e",
                                         "rootFolder": "Files"
                                     }
                                 }
@@ -187,7 +187,7 @@
                                 }
                             },
                             "externalReferences": {
-                                "connection": "e18da205-1457-4fb5-904e-7b853a0fc0c6"
+                                "connection": "d8919848-6583-403d-9cab-ba993504532f"
                             }
                         }
                     },
@@ -204,8 +204,8 @@
                                     "annotations": [],
                                     "type": "Lakehouse",
                                     "typeProperties": {
-                                        "workspaceId": "84912f9a-8d9a-43d0-a945-99e74142a0f2",
-                                        "artifactId": "3d020a17-ccd9-402e-9f1a-01c458a797b2",
+                                        "workspaceId": "80b178c4-ac51-40c7-b808-a5385f9e0ed3",
+                                        "artifactId": "7a3fab9c-8535-4d8a-a8f4-dafad988a13e",
                                         "rootFolder": "Files"
                                     }
                                 }
@@ -255,7 +255,7 @@
                                 }
                             },
                             "externalReferences": {
-                                "connection": "e18da205-1457-4fb5-904e-7b853a0fc0c6"
+                                "connection": "d8919848-6583-403d-9cab-ba993504532f"
                             }
                         }
                     },
@@ -272,8 +272,8 @@
                                     "annotations": [],
                                     "type": "Lakehouse",
                                     "typeProperties": {
-                                        "workspaceId": "84912f9a-8d9a-43d0-a945-99e74142a0f2",
-                                        "artifactId": "3d020a17-ccd9-402e-9f1a-01c458a797b2",
+                                        "workspaceId": "80b178c4-ac51-40c7-b808-a5385f9e0ed3",
+                                        "artifactId": "7a3fab9c-8535-4d8a-a8f4-dafad988a13e",
                                         "rootFolder": "Files"
                                     }
                                 }

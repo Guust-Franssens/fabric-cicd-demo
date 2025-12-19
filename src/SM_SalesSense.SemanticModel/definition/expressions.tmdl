@@ -1,4 +1,4 @@
-expression Server = "x6eps4xrq2xudenlfv6naeo3i4-tixzdbe2rxiehkkfthtucqva6i.msit-datawarehouse.fabric.microsoft.com" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+expression Server = "6ns37iy3jbgebnu5m7s33girv4-yr4ldacrvtduboaiuu4f7hqo2m.datawarehouse.fabric.microsoft.com" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
 	lineageTag: 39c7bef4-452b-4b29-846c-f788ef1af01f
 
 	annotation PBI_ResultType = Text
