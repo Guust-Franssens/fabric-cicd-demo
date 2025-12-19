@@ -21,7 +21,7 @@ jobs:
       - name: Setup Fabric CLI
         run: |
           # Install Fabric CLI
-          pip install git+https://github.com/microsoft/fabric-cli.git jq
+          pip install ms-fabric-cli jq
 
           # Verify installation
           fab --version
