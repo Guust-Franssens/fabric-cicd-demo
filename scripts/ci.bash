@@ -48,37 +48,12 @@ WORKSPACE_ID=$(fab get ${WORKSPACE_NAME} -q id | tr -d '\r\n')
 echo "✓ Workspace created with ID: ${WORKSPACE_ID}"
 
 # Step 2: Grant admin security group access to the workspace
-echo "Step 2: Granting admin access..."
-PAYLOAD='{
-  "principal": {
-    "displayName": "'${SECGROUP_ADMINS_NAME}'",
-    "id": "'${SECGROUP_ADMINS_ID}'",
-    "type": "Group",
-    "groupDetails": {
-      "groupType": "SecurityGroup"
-    }
-  },
-  "role": "Admin"
-}'
-fab api -X post workspaces/${WORKSPACE_ID}/roleAssignments -i "${PAYLOAD}"
-echo "✓ Admin access granted"
+echo "Step 2 setting workspace accesses..."
+fab acl set ${WORKSPACE_NAME} --identity "${SECGROUP_ADMINS_ID}" --role admin --force
 
 # Step 3: Grant developer security group access to the workspace
-if [ -n "${SECGROUP_DEVS_ID}" ] && [ -n "${SECGROUP_DEVS_NAME}" ]; then
-  echo "Step 3: Granting developer access..."
-  PAYLOAD='{
-    "principal": {
-      "displayName": "'${SECGROUP_DEVS_NAME}'",
-      "id": "'${SECGROUP_DEVS_ID}'",
-      "type": "Group",
-      "groupDetails": {
-        "groupType": "SecurityGroup"
-      }
-    },
-    "role": "Contributor"
-  }'
-  fab api -X post workspaces/${WORKSPACE_ID}/roleAssignments -i "${PAYLOAD}"
-  echo "✓ Developer access granted"
+if [ -n "${SECGROUP_DEVS_ID}" ]; then
+  fab acl set ${WORKSPACE_NAME} --identity "${SECGROUP_DEVS_ID}" --role contributor --force
 else
   echo "⊘ Skipping developer access (no dev security group configured)"
 fi
