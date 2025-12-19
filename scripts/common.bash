@@ -71,3 +71,21 @@ delete_workspace() {
   fab rm --force "${workspace_name}"
   echo "✓ Workspace deleted successfully"
 }
+
+# Check API response status code and exit on error
+# Usage: check_api_response "$RESPONSE" "Optional success message"
+check_api_response() {
+  local response="$1"
+  local success_message="${2:-}"
+  
+  local status_code=$(echo "${response}" | jq -r '.status_code')
+  
+  if [ "$status_code" -ge 200 ] && [ "$status_code" -lt 300 ]; then
+    [ -n "$success_message" ] && echo "✓ $success_message"
+    return 0
+  else
+    echo "✗ API call failed with status code: $status_code"
+    echo "${response}" | jq '.'
+    return 1 2>/dev/null || exit 1
+  fi
+}

@@ -1,4 +1,4 @@
-set -e
+# set -e
 
 # Load common utility functions
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -70,7 +70,7 @@ fi
 # Step 5: Create link to git
 echo "Step 5: Connecting workspace to Git repository..."
 CONNECTION_ID=$(fab get .connections/${GIT_CONNECTION_NAME} -q id | tr -d '\r\n')
-fab api -X post workspaces/${WORKSPACE_ID}/git/connect -i '{
+BODY='{
   "gitProviderDetails": {
     "ownerName": "'${GIT_REPO_OWNER}'",
     "repositoryName": "'${GIT_REPO_NAME}'",
@@ -83,21 +83,21 @@ fab api -X post workspaces/${WORKSPACE_ID}/git/connect -i '{
     "connectionId": "'${CONNECTION_ID}'"
   }
 }'
-echo "✓ Git connection established"
+RESPONSE=$(fab api -X post workspaces/${WORKSPACE_ID}/git/connect -i "${BODY}")
+check_api_response "$RESPONSE" "✓ Git connection established"
 
 # Step 6: Initialize the connection and populate the workspace with the git repo
 echo "Step 6: Initializing Git connection and syncing items..."
-fab api -X post workspaces/${WORKSPACE_ID}/git/initializeConnection -i '{
-  "initializationStrategy": "PreferRemote"
-}'
-echo "✓ Git connection initialized"
+BODY='{"initializationStrategy": "PreferRemote"}' 
+RESPONSE=$(fab api -X post workspaces/${WORKSPACE_ID}/git/initializeConnection -i "${BODY}")
+check_api_response "$RESPONSE" "✓ Git connection initialized"
 
+# Step 7: Fetch items from git
 echo "Step 7: Fetching items from Git..."
 REMOTE_COMMIT_HASH=$(fab api workspaces/${WORKSPACE_ID}/git/status | jq -r '.text.remoteCommitHash' | tr -d '\r\n')
-fab api -X post workspaces/${WORKSPACE_ID}/git/updateFromGit -i '{
-  "remoteCommitHash": "'${REMOTE_COMMIT_HASH}'"
-}'
-echo "✓ Items deployed from Git commit: ${REMOTE_COMMIT_HASH}"
+BODY='{"remoteCommitHash": "'${REMOTE_COMMIT_HASH}'"}'
+RESPONSE=$(fab api -X post workspaces/${WORKSPACE_ID}/git/updateFromGit -i "${BODY}")
+check_api_response "$RESPONSE" "✓ Items deployed from Git commit: ${REMOTE_COMMIT_HASH}"
 
 echo "========================================="
 echo "✓ CI Pipeline Completed Successfully!"
