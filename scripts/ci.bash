@@ -1,4 +1,4 @@
-set -euo pipefail
+set -e
 
 # Load common utility functions
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -134,4 +134,4 @@ echo "Branch (safe): ${BRANCH_NAME_SAFE}"
 echo "Commit: ${REMOTE_COMMIT_HASH}"
 echo "========================================="
 
-set +e +u +o
+set +e
