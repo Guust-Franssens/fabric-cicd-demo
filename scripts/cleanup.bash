@@ -42,9 +42,7 @@ if [ -z "${WORKSPACE_EXISTS}" ]; then
 fi
 
 # Delete the workspace
-echo "Deleting workspace '${WORKSPACE_NAME}'..."
 delete_workspace "${WORKSPACE_NAME}"
-echo "✓ Workspace deleted successfully"
 
 echo "========================================="
 echo "Cleanup completed successfully!"
