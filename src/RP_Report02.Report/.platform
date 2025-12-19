@@ -1,11 +1,11 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
   "metadata": {
-    "type": "Lakehouse",
-    "displayName": "LH_Fabric_CICD"
+    "type": "Report",
+    "displayName": "RP_Report02"
   },
   "config": {
     "version": "2.0",
-    "logicalId": "2eb375f0-f3d5-ac78-4065-2d3a0659eb9f"
+    "logicalId": "00000000-0000-0000-0000-000000000000"
   }
 }
