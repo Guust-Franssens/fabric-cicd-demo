@@ -1,12 +1,12 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
   "metadata": {
-    "type": "Notebook",
-    "displayName": "NB_collect_github_metrics_fabric_cli",
-    "description": "New notebook"
+    "type": "DataPipeline",
+    "displayName": "DP_INGST_CopyCSV",
+    "description": "Imported from fab"
   },
   "config": {
     "version": "2.0",
-    "logicalId": "812e4c24-dcf8-b4a3-4feb-97dc4622e3f0"
+    "logicalId": "d3b1a085-e649-85fd-484e-614754749365"
   }
 }

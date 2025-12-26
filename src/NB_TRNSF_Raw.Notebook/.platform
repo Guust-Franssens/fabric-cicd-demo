@@ -1,11 +1,12 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
   "metadata": {
-    "type": "Lakehouse",
-    "displayName": "LH_Fabric_CICD"
+    "type": "Notebook",
+    "displayName": "NB_TRNSF_Raw",
+    "description": "Imported from fab"
   },
   "config": {
     "version": "2.0",
-    "logicalId": "2eb375f0-f3d5-ac78-4065-2d3a0659eb9f"
+    "logicalId": "41911fc9-1e37-9f03-4325-147423aa4b5c"
   }
 }
