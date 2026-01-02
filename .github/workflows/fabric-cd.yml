@@ -4,8 +4,7 @@ on:
   push:
     branches:
       - main
-      - dev
-      - test
+      - ppe
   workflow_dispatch:
 
 jobs:
@@ -36,20 +35,14 @@ jobs:
           BRANCH_NAME="${GITHUB_REF#refs/heads/}"
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
           echo "PROJECT_NAME=${{ vars.PROJECT_NAME }}" >> $GITHUB_ENV
-          echo "DEV_WORKSPACE_ID=${{ vars.DEV_WORKSPACE_ID }}" >> $GITHUB_ENV
-          echo "TEST_WORKSPACE_ID=${{ vars.TEST_WORKSPACE_ID }}" >> $GITHUB_ENV
-          echo "PROD_WORKSPACE_ID=${{ vars.PROD_WORKSPACE_ID }}" >> $GITHUB_ENV
           
           # Set workspace ID based on branch
           case "$BRANCH_NAME" in
             main)
               echo "ENVIRONMENT=prod" >> $GITHUB_ENV
               ;;
-            dev)
-              echo "ENVIRONMENT=dev" >> $GITHUB_ENV
-              ;;
-            test)
-              echo "ENVIRONMENT=test" >> $GITHUB_ENV
+            ppe)
+              echo "ENVIRONMENT=ppe" >> $GITHUB_ENV
               ;;
             *)
               echo "Unknown branch: $BRANCH_NAME"
