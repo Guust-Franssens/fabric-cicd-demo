@@ -11,7 +11,7 @@ from config import DEPLOY_CONFIG
 def run_fab_command(command, capture_output: bool = False, silently_continue: bool = False, timeout: int = 300):
     """Run fabric CLI command with timeout protection (default 5 minutes)."""
     try:
-        result = subprocess.run(["fab", "-c", command], capture_output=capture_output, text=True, timeout=timeout)
+        result = subprocess.run(f"fab {command}", shell=True, capture_output=capture_output, text=True, timeout=timeout)
         if not (silently_continue) and (result.returncode > 0 or result.stderr):
             msg = (
                 f"Error running fab command: {command}\n"
@@ -53,9 +53,52 @@ def create_connection(connection_name: str = None, parameters: dict = None, upns
         if len(upns) > 0:
             print(f"Adding UPNs to item {connection_name}")
             for upn in upns:
-                run_fab_command(f"acl set -f .connections/{connection_name}.Connection -I {upn} -R admin")
+                run_fab_command(f"acl set -f .connections/{connection_name}.Connection -I {upn} -R Owner")
 
     return connection_id
+
+
+def bind_semantic_model_connection(
+    workspace_id: str,
+    semantic_model_id: str,
+    connection_id: str,
+    sql_endpoint: str,
+    database: str,
+) -> dict | str:
+    """
+    Binds a semantic model to a lakehouse connection.
+
+    Args:
+        workspace_id: The workspace ID containing the semantic model
+        semantic_model_id: The semantic model ID to bind
+        connection_id: The connection ID to bind to
+        sql_endpoint: The SQL endpoint server address
+        database: The database name
+
+    Raises:
+        Exception: If the binding fails with status code >= 300
+    """
+    body = {
+        "connectionBinding": {
+            "id": connection_id,
+            "connectivityType": "ShareableCloud",
+            "datasourceType": "Sql",
+            "connectionDetails": {
+                "type": "SQL",
+                "path": f"{sql_endpoint};{database}",
+            },
+        }
+    }
+
+    uri = f"workspaces/{workspace_id}/semanticModels/{semantic_model_id}/bindConnection"
+    result = run_fab_command(f"api -X post /{uri} -i '{json.dumps(body)}'", capture_output=True)
+
+    try:
+        result_json = json.loads(result)
+    except json.JSONDecodeError:
+        result_json = None
+
+    return result_json if result_json is not None else result
 
 
 def exists(item_path: str) -> bool:

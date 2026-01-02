@@ -7,7 +7,7 @@ load_env
 
 # THESE SHOULD BE SET IN .env FILE (local) OR AS GITHUB SECRETS (CI/CD)
 CAPACITY_NAME="${CAPACITY_NAME:-}"
-SECGROUP_ADMINS_ID="${SECGROUP_ADMINS_ID:-}"
+export SECGROUP_ADMINS_ID="${SECGROUP_ADMINS_ID:-}"
 
 # Validate environment
 if [[ "${ENVIRONMENT}" != "prod" && "${ENVIRONMENT}" != "ppe" ]]; then
